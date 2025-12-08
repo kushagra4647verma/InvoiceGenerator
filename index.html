@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ORION Diamonds - Invoice Generator</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </head>
+
+  <body>
+    <h2 class="title">ORION Diamonds – Invoice Generator</h2>
+
+    <div class="form-container">
+      <label>Customer Name:</label>
+      <input id="custName" />
+
+      <label>Customer Mobile:</label>
+      <input id="custMobile" />
+
+      <label>Billing Address:</label>
+      <textarea id="billAddr"></textarea>
+
+      <label>Shipping Address:</label>
+      <textarea id="shipAddr"></textarea>
+
+      <label>Invoice Number:</label>
+      <input id="invoiceNum" />
+
+      <label>Invoice Date:</label>
+      <input type="date" id="invoiceDate" />
+
+      <h3><b>Item Details</b></h3>
+
+      <label>Item Name:</label>
+      <input id="itemName" />
+
+      <label>Gross Weight:</label>
+      <input id="grossWt" />
+
+      <label>Net Weight:</label>
+      <input id="netWt" />
+
+      <label>Rate (INR):</label>
+      <input id="rate" />
+
+      <label>Amount (INR):</label>
+      <input id="amount" />
+
+      <h3><b>GST Details</b></h3>
+
+      <label>CGST %:</label>
+      <input id="cgst" value="1.5" />
+
+      <label>SGST %:</label>
+      <input id="sgst" value="1.5" />
+
+      <label>IGST %:</label>
+      <input id="igst" value="0" />
+
+      <button class="submit-btn" onclick="generateInvoice()">
+        Generate & Download PDF
+      </button>
+    </div>
+
+    <!-- ================= INVOICE TEMPLATE =================== -->
+
+    <div id="invoice" class="invoice">
+      <div class="inv-header">
+        <div class="inv-left">
+          <h2>ORION DIAMONDS</h2>
+          <p>GSTIN: 27BRDPJ6385G1ZJ</p>
+          <p>
+            GAT NO 331-338, Plot No. 2, Near BJP Market, Tal Hatkanangale,<br />
+            Ichalkaranji, Kolhapur, Maharashtra - 416115
+          </p>
+          <p>Mobile: 7022253092</p>
+          <p>Email: info@oriondiamonds.in</p>
+        </div>
+
+        <div class="inv-right">
+          <img src="logo.jpg" class="logo" />
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="inv-row">
+        <div class="inv-col">
+          <p><b>Invoice No:</b> <span id="out_invoiceNum"></span></p>
+        </div>
+        <div class="inv-col">
+          <p><b>Invoice Date:</b> <span id="out_invoiceDate"></span></p>
+        </div>
+      </div>
+
+      <table class="cust-table">
+        <tr>
+          <td><b>Customer Name:</b></td>
+          <td id="out_custName"></td>
+
+          <td><b>Billing Address:</b></td>
+          <td id="out_billAddr"></td>
+
+          <td><b>Shipping Address:</b></td>
+          <td id="out_shipAddr"></td>
+        </tr>
+
+        <tr>
+          <td><b>Contact:</b></td>
+          <td id="out_custMobile"></td>
+
+          <td></td>
+          <td></td>
+
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+
+      <table class="item-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Gross WT</th>
+            <th>Net WT</th>
+            <th>Rate (INR)</th>
+            <th>Amount (INR)</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td id="out_itemName"></td>
+            <td id="out_grossWt"></td>
+            <td id="out_netWt"></td>
+            <td id="out_rate"></td>
+            <td id="out_amount"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="gst-simple">
+        <tr>
+          <td>CGST</td>
+          <td>₹ <span id="out_cgst"></span></td>
+        </tr>
+
+        <tr>
+          <td>SGST</td>
+          <td>₹ <span id="out_sgst"></span></td>
+        </tr>
+
+        <tr>
+          <td>IGST</td>
+          <td>₹ <span id="out_igst"></span></td>
+        </tr>
+
+        <tr class="grand">
+          <td><b>Grand Total</b></td>
+          <td>
+            <b>₹ <span id="out_total"></span></b>
+          </td>
+        </tr>
+      </table>
+
+      <div class="footer">
+        <div class="bank-box">
+          <h3>Bank Details</h3>
+          <p>Ac No: 925020038972487</p>
+          <p>IFSC: UTIB0000606</p>
+          <p>Bank: Axis Bank</p>
+          <p>Branch: Ichalkaranji</p>
+        </div>
+
+        <!-- <div class="sign-box">
+          <img src="stamp.png" class="stamp-img" />
+          <p>__________________________</p>
+          <p>Authorized Signatory</p>
+        </div> -->
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
