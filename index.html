@@ -33,31 +33,15 @@
 
       <h3><b>Item Details</b></h3>
 
-      <label>Item Name:</label>
-      <input id="itemName" />
+      <div id="itemContainer"></div>
 
-      <label>Gross Weight:</label>
-      <input id="grossWt" />
-
-      <label>Net Weight:</label>
-      <input id="netWt" />
-
-      <label>Rate (INR):</label>
-      <input id="rate" />
-
-      <label>Amount (INR):</label>
-      <input id="amount" />
-
+      <button type="button" class="add-btn" onclick="addItem()">
+        + Add Item
+      </button>
       <h3><b>GST Details</b></h3>
-
-      <label>CGST %:</label>
-      <input id="cgst" value="1.5" />
-
-      <label>SGST %:</label>
-      <input id="sgst" value="1.5" />
-
-      <label>IGST %:</label>
-      <input id="igst" value="0" />
+      <label>CGST %:</label> <input id="cgst" value="1.5" />
+      <label>SGST %:</label> <input id="sgst" value="1.5" />
+      <label>IGST %:</label> <input id="igst" value="0" />
 
       <button class="submit-btn" onclick="generateInvoice()">
         Generate & Download PDF
@@ -130,30 +114,27 @@
           </tr>
         </thead>
 
-        <tbody>
-          <tr>
-            <td id="out_itemName"></td>
-            <td id="out_grossWt"></td>
-            <td id="out_netWt"></td>
-            <td id="out_rate"></td>
-            <td id="out_amount"></td>
-          </tr>
-        </tbody>
+        <tbody id="item_out"></tbody>
       </table>
 
       <table class="gst-simple">
         <tr>
-          <td>CGST</td>
+          <td>Amount</td>
+          <td>₹ <span id="out_amount"></span></td>
+        </tr>
+
+        <tr>
+          <td>CGST (1.5%)</td>
           <td>₹ <span id="out_cgst"></span></td>
         </tr>
 
         <tr>
-          <td>SGST</td>
+          <td>SGST (1.5%)</td>
           <td>₹ <span id="out_sgst"></span></td>
         </tr>
 
         <tr>
-          <td>IGST</td>
+          <td>IGST (3%)</td>
           <td>₹ <span id="out_igst"></span></td>
         </tr>
 
