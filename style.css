@@ -182,6 +182,33 @@ textarea {
   text-align: left;
   padding-left: 12px;
 }
+.stamp-img {
+  width: 120px;
+  opacity: 0.85;
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+  margin-bottom: 2px;
+}
+/* Container that crops the stamp */
+.stamp-crop {
+  width: 120px; /* final visible stamp width */
+  height: 136px; /* final visible stamp height */
+  overflow: hidden; /* hides the rest of the large image */
+  position: relative;
+  margin-left: auto; /* align to right */
+  margin-bottom: 5px;
+}
+
+/* The real stamp image (full vertical image) */
+.stamp-real {
+  width: 300px; /* increase/decrease until stamp fits */
+  position: absolute;
+  top: 50%; /* move to vertical center */
+  left: 50%; /* move to horizontal center */
+  transform: translate(-50%, -50%); /* center crop */
+  opacity: 0.85;
+}
 
 .gst-box {
   margin-top: 20px;
