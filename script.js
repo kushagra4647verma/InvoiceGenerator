@@ -8,43 +8,46 @@ function generateInvoiceNumber() {
 document.getElementById("invoiceNum").value = generateInvoiceNumber();
 
 function addItem() {
-  const id = Date.now();
+  const container = document.getElementById("itemContainer");
 
-  const div = document.createElement("div");
-  div.className = "itemRow";
-  div.dataset.id = id;
+  const itemHTML = `
+    <div class="item-block">
 
-  div.innerHTML = `
-        <label>Item Name:</label>
-        <input class="itemName">
+      <label>Item Name:</label>
+      <input class="itemName" />
 
-        <label>Gross WT:</label>
-        <input class="grossWt">
+      <label>Gross Weight:</label>
+      <input class="grossWt" />
 
-        <label>Net WT:</label>
-        <input class="netWt">
+      <label>Net Weight:</label>
+      <input class="netWt" />
 
-        <label>Rate:</label>
-        <input class="rate">
+      <label>Rate (INR):</label>
+      <input class="rate" />
 
-        <label>Amount:</label>
-        <input class="amount">
+      <label>Amount (INR):</label>
+      <input class="amount" />
 
-        <button type="button" class="del-btn" onclick="removeItem(${id})">Delete</button>
+      <hr />
 
-        <hr>
-    `;
+      <label><b>Gold Breakdown:</b></label>
+      <input class="goldBreak" placeholder="Gold (18kt, 5.20gm) = ₹24500" />
 
-  document.getElementById("itemContainer").appendChild(div);
-}
+      <label><b>Diamond Breakdown:</b></label>
+      <input class="diaBreak" placeholder="Diamond (0.20ct, 0.05ct) = ₹12300" />
 
-function removeItem(id) {
-  const row = document.querySelector(`[data-id='${id}']`);
-  if (row) row.remove();
+      <label><b>Making Charges:</b></label>
+      <input class="makingBreak" placeholder="₹1950" />
+
+      <hr />
+    </div>
+  `;
+
+  container.insertAdjacentHTML("beforeend", itemHTML);
 }
 
 function generateInvoice() {
-  // Fill Basic Outputs
+  // ===== BASIC DETAILS =====
   document.getElementById("out_invoiceNum").textContent =
     document.getElementById("invoiceNum").value;
   document.getElementById("out_invoiceDate").textContent =
@@ -58,35 +61,63 @@ function generateInvoice() {
   document.getElementById("out_shipAddr").textContent =
     document.getElementById("shipAddr").value;
 
-  // ITEM TABLE OUTPUT
-  const names = document.querySelectorAll(".itemName");
-  const gross = document.querySelectorAll(".grossWt");
-  const net = document.querySelectorAll(".netWt");
-  const rate = document.querySelectorAll(".rate");
-  const amount = document.querySelectorAll(".amount");
+  // ===== COLLECT ITEM VALUES =====
+  const itemNames = [...document.querySelectorAll(".itemName")].map(
+    (i) => i.value
+  );
+  const grossWts = [...document.querySelectorAll(".grossWt")].map(
+    (i) => i.value
+  );
+  const netWts = [...document.querySelectorAll(".netWt")].map((i) => i.value);
+  const rates = [...document.querySelectorAll(".rate")].map((i) => i.value);
+  const amounts = [...document.querySelectorAll(".amount")].map((i) => i.value);
+
+  // NEW BREAKDOWN FIELDS
+  const goldBreak = [...document.querySelectorAll(".goldBreak")].map(
+    (i) => i.value
+  );
+  const diaBreak = [...document.querySelectorAll(".diaBreak")].map(
+    (i) => i.value
+  );
+  const makingBreak = [...document.querySelectorAll(".makingBreak")].map(
+    (i) => i.value
+  );
 
   let tableHTML = "";
   let subtotal = 0;
 
-  for (let i = 0; i < names.length; i++) {
-    if (names[i].value.trim() === "") continue;
+  // ===== BUILD ITEM TABLE WITH BREAKDOWN =====
+  for (let i = 0; i < itemNames.length; i++) {
+    if (itemNames[i].trim() === "") continue;
 
     tableHTML += `
-            <tr>
-                <td>${names[i].value}</td>
-                <td>${gross[i].value}</td>
-                <td>${net[i].value}</td>
-                <td>${rate[i].value}</td>
-                <td>${amount[i].value}</td>
-            </tr>
-        `;
+      <tr>
+        <td>${itemNames[i]}</td>
+        <td>${grossWts[i]}</td>
+        <td>${netWts[i]}</td>
+        <td>${rates[i]}</td>
+        <td>${amounts[i]}</td>
+      </tr>
 
-    subtotal += Number(amount[i].value);
+      <tr class="detail-row">
+        <td colspan="5" style="padding-left: 10px; font-size: 13px;">
+          ${goldBreak[i] ? `<div><b>${goldBreak[i]}</b></div>` : ""}
+          ${diaBreak[i] ? `<div><b>${diaBreak[i]}</b></div>` : ""}
+          ${
+            makingBreak[i]
+              ? `<div><b>Making Charges:</b> ${makingBreak[i]}</div>`
+              : ""
+          }
+        </td>
+      </tr>
+    `;
+
+    subtotal += Number(amounts[i]);
   }
 
   document.getElementById("item_out").innerHTML = tableHTML;
 
-  // GST CALCULATION
+  // ===== GST CALCULATION =====
   const cgstRate = Number(document.getElementById("cgst").value);
   const sgstRate = Number(document.getElementById("sgst").value);
   const igstRate = Number(document.getElementById("igst").value);
@@ -103,7 +134,7 @@ function generateInvoice() {
   document.getElementById("out_igst").textContent = igst.toFixed(2);
   document.getElementById("out_total").textContent = total.toFixed(2);
 
-  // Generate PDF
+  // ===== GENERATE PDF =====
   html2canvas(document.getElementById("invoice")).then((canvas) => {
     const img = canvas.toDataURL("image/png");
     const pdf = new jspdf.jsPDF("p", "mm", "a4");
