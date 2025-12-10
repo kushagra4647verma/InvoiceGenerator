@@ -30,14 +30,33 @@ function addItem() {
 
       <hr />
 
-      <label><b>Gold Breakdown:</b></label>
-      <input class="goldBreak" placeholder="Gold (18kt, 5.20gm) = ₹24500" />
+      <h4><b>Gold Details</b></h4>
+      <label>Purity:</label>
+      <select class="goldPurity">
+        <option value="18kt">18kt</option>
+        <option value="14kt">14kt</option>
+        <option value="22kt">22kt</option>
+      </select>
 
-      <label><b>Diamond Breakdown:</b></label>
-      <input class="diaBreak" placeholder="Diamond (0.20ct, 0.05ct) = ₹12300" />
+      <label>Gold Weight (gm):</label>
+      <input class="goldWeight" />
 
-      <label><b>Making Charges:</b></label>
-      <input class="makingBreak" placeholder="₹1950" />
+      <label>Gold Amount (₹):</label>
+      <input class="goldAmount" />
+
+      <hr />
+
+      <h4><b>Diamond Details</b></h4>
+      <label>Carat List (comma separated):</label>
+      <input class="diamondCarats" placeholder="5-0.02ct,3-0.02ct,4-0.05" />
+
+      <label>Diamond Amount (₹):</label>
+      <input class="diamondAmount" />
+
+      <hr />
+
+      <label><b>Making Charges (₹):</b></label>
+      <input class="makingAmount" />
 
       <hr />
     </div>
@@ -71,6 +90,26 @@ function generateInvoice() {
   const netWts = [...document.querySelectorAll(".netWt")].map((i) => i.value);
   const rates = [...document.querySelectorAll(".rate")].map((i) => i.value);
   const amounts = [...document.querySelectorAll(".amount")].map((i) => i.value);
+  const goldPurity = [...document.querySelectorAll(".goldPurity")].map(
+    (i) => i.value
+  );
+  const goldWeight = [...document.querySelectorAll(".goldWeight")].map(
+    (i) => i.value
+  );
+  const goldAmount = [...document.querySelectorAll(".goldAmount")].map(
+    (i) => i.value
+  );
+
+  const diamondCarats = [...document.querySelectorAll(".diamondCarats")].map(
+    (i) => i.value
+  );
+  const diamondAmount = [...document.querySelectorAll(".diamondAmount")].map(
+    (i) => i.value
+  );
+
+  const makingAmount = [...document.querySelectorAll(".makingAmount")].map(
+    (i) => i.value
+  );
 
   // NEW BREAKDOWN FIELDS
   const goldBreak = [...document.querySelectorAll(".goldBreak")].map(
@@ -91,26 +130,26 @@ function generateInvoice() {
     if (itemNames[i].trim() === "") continue;
 
     tableHTML += `
-      <tr>
-        <td>${itemNames[i]}</td>
-        <td>${grossWts[i]}</td>
-        <td>${netWts[i]}</td>
-        <td>${rates[i]}</td>
-        <td>${amounts[i]}</td>
-      </tr>
+<tr>
+  <td>${itemNames[i]}</td>
+  <td>${grossWts[i]}</td>
+  <td>${netWts[i]}</td>
+  <td>${rates[i]}</td>
+  <td>
+    ₹${amounts[i]}
 
-      <tr class="detail-row">
-        <td colspan="5" style="padding-left: 10px; font-size: 13px;">
-          ${goldBreak[i] ? `<div><b>${goldBreak[i]}</b></div>` : ""}
-          ${diaBreak[i] ? `<div><b>${diaBreak[i]}</b></div>` : ""}
-          ${
-            makingBreak[i]
-              ? `<div><b>Making Charges:</b> ${makingBreak[i]}</div>`
-              : ""
-          }
-        </td>
-      </tr>
-    `;
+    <div style="font-size:12px; margin-top:6px;">
+
+      <div><b>Gold:</b> ${goldPurity[i]}, ${goldWeight[i]}g = ₹${goldAmount[i]}</div>
+
+      <div><b>Diamond:</b> (${diamondCarats[i]}) = ₹${diamondAmount[i]}</div>
+
+      <div><b>Making:</b> ₹${makingAmount[i]}</div>
+
+    </div>
+  </td>
+</tr>
+`;
 
     subtotal += Number(amounts[i]);
   }
