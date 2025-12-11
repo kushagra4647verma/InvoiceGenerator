@@ -394,17 +394,17 @@
         </div>
       </div>
 
-      <table class="cust-table">
-        <tr>
+      <table class="cust-table" id="cust_table_wrapper">
+        <tr id="row1" style="display: none">
           <td width="15%"><b>Customer Name:</b></td>
           <td width="35%" id="out_custName"></td>
-          <td width="15%"><b>Billing Address:</b></td>
+          <td width="15%" id="bill_label"><b>Billing Address:</b></td>
           <td width="35%" id="out_billAddr"></td>
         </tr>
-        <tr>
+        <tr id="row2" style="display: none">
           <td><b>Contact:</b></td>
           <td id="out_custMobile"></td>
-          <td><b>Shipping Address:</b></td>
+          <td id="ship_label"><b>Shipping Address:</b></td>
           <td id="out_shipAddr"></td>
         </tr>
       </table>
@@ -489,6 +489,14 @@
         );
       }
 
+      // Clean and parse currency input
+      function parseAmount(value) {
+        if (!value) return 0;
+        // Remove ₹ symbol, commas, and spaces
+        const cleaned = String(value).replace(/[₹,\s]/g, "");
+        return parseFloat(cleaned) || 0;
+      }
+
       // Set initial invoice number
       document.getElementById("invoiceNum").value = generateInvoiceNumber();
 
@@ -519,29 +527,29 @@
               </div>
               <div class="form-group">
                 <label>Gold Weight (g):</label>
-                <input type="number" step="0.01" class="goldWeight" oninput="updateInvoice()" />
+                <input type="text" class="goldWeight" oninput="updateInvoice()" placeholder="0.00" />
               </div>
             </div>
 
             <div class="item-row">
               <div class="form-group">
                 <label>Gold Total Value (₹):</label>
-                <input type="number" step="0.01" class="goldValue" oninput="updateInvoice()" />
+                <input type="text" class="goldValue" oninput="updateInvoice()" placeholder="₹0.00" />
               </div>
               <div class="form-group">
                 <label>Gold Making Charges (₹):</label>
-                <input type="number" step="0.01" class="makingCharges" oninput="updateInvoice()" />
+                <input type="text" class="makingCharges" oninput="updateInvoice()" placeholder="₹0.00" />
               </div>
               <div class="form-group">
                 <label>Diamond Total Carats:</label>
-                <input type="number" step="0.01" class="diamondCarats" oninput="updateInvoice()" />
+                <input type="text" class="diamondCarats" oninput="updateInvoice()" placeholder="0.00" />
               </div>
             </div>
 
             <div class="item-row">
               <div class="form-group">
                 <label>Diamond Total Value (₹):</label>
-                <input type="number" step="0.01" class="diamondValue" oninput="updateInvoice()" />
+                <input type="text" class="diamondValue" oninput="updateInvoice()" placeholder="₹0.00" />
               </div>
             </div>
           </div>
@@ -556,14 +564,47 @@
           document.getElementById("invoiceNum").value;
         document.getElementById("out_invoiceDate").textContent =
           document.getElementById("invoiceDate").value;
-        document.getElementById("out_custName").textContent =
-          document.getElementById("custName").value;
-        document.getElementById("out_custMobile").textContent =
-          document.getElementById("custMobile").value;
-        document.getElementById("out_billAddr").textContent =
-          document.getElementById("billAddr").value;
-        document.getElementById("out_shipAddr").textContent =
-          document.getElementById("shipAddr").value;
+
+        // Get values
+        const custName = document.getElementById("custName").value.trim();
+        const custMobile = document.getElementById("custMobile").value.trim();
+        const billAddr = document.getElementById("billAddr").value.trim();
+        const shipAddr = document.getElementById("shipAddr").value.trim();
+
+        // Update content
+        document.getElementById("out_custName").textContent = custName;
+        document.getElementById("out_custMobile").textContent = custMobile;
+        document.getElementById("out_billAddr").textContent = billAddr;
+        document.getElementById("out_shipAddr").textContent = shipAddr;
+
+        // Check if any field in row 1 has data
+        const row1HasData = custName || billAddr;
+        // Check if any field in row 2 has data
+        const row2HasData = custMobile || shipAddr;
+
+        // Show/hide rows based on data
+        document.getElementById("row1").style.display = row1HasData
+          ? ""
+          : "none";
+        document.getElementById("row2").style.display = row2HasData
+          ? ""
+          : "none";
+
+        // Hide entire customer table if no data
+        const custTableWrapper = document.getElementById("cust_table_wrapper");
+        if (!row1HasData && !row2HasData) {
+          custTableWrapper.style.display = "none";
+        } else {
+          custTableWrapper.style.display = "";
+        }
+
+        // Hide labels if corresponding fields are empty
+        document.getElementById("bill_label").style.display = billAddr
+          ? ""
+          : "none";
+        document.getElementById("ship_label").style.display = shipAddr
+          ? ""
+          : "none";
 
         // Collect all item data
         const itemNames = [...document.querySelectorAll(".itemName")].map(
@@ -573,20 +614,20 @@
           (i) => i.value
         );
         const goldWeight = [...document.querySelectorAll(".goldWeight")].map(
-          (i) => parseFloat(i.value) || 0
+          (i) => parseAmount(i.value)
         );
         const goldValue = [...document.querySelectorAll(".goldValue")].map(
-          (i) => parseFloat(i.value) || 0
+          (i) => parseAmount(i.value)
         );
         const makingCharges = [
           ...document.querySelectorAll(".makingCharges"),
-        ].map((i) => parseFloat(i.value) || 0);
+        ].map((i) => parseAmount(i.value));
         const diamondCarats = [
           ...document.querySelectorAll(".diamondCarats"),
-        ].map((i) => parseFloat(i.value) || 0);
+        ].map((i) => parseAmount(i.value));
         const diamondValue = [
           ...document.querySelectorAll(".diamondValue"),
-        ].map((i) => parseFloat(i.value) || 0);
+        ].map((i) => parseAmount(i.value));
 
         let tableHTML = "";
         let subtotal = 0;
@@ -650,18 +691,27 @@
 
       function generatePDF() {
         html2canvas(document.getElementById("invoice"), {
-          scale: 2,
+          scale: 1.5, // Reduced from 2 to 1.5 for smaller file size
           useCORS: true,
+          logging: false,
+          imageTimeout: 0,
         }).then((canvas) => {
-          const imgData = canvas.toDataURL("image/png");
+          // Convert to JPEG with compression instead of PNG
+          const imgData = canvas.toDataURL("image/jpeg", 0.85); // 0.85 quality (85%)
           const pdf = new jspdf.jsPDF("p", "mm", "a4");
 
           const pdfWidth = 210;
           const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-          pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+          // Use JPEG instead of PNG for smaller size
+          pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+          // Compress the PDF
           pdf.save(
-            `Invoice-${document.getElementById("invoiceNum").value}.pdf`
+            `Invoice-${document.getElementById("invoiceNum").value}.pdf`,
+            {
+              compress: true,
+            }
           );
 
           // Increment counter and generate new invoice number
